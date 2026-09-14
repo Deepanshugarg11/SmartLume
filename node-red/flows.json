@@ -1,0 +1,80 @@
+[
+    {
+        "id": "4f29fe90d9f287b6",
+        "type": "tab",
+        "label": "SmartLume Processing",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "23a72bad80da8c0c",
+        "type": "http in",
+        "z": "4f29fe90d9f287b6",
+        "name": "",
+        "url": "/sensor",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 90,
+        "y": 380,
+        "wires": [
+            [
+                "4f2d20434c88e418"
+            ]
+        ]
+    },
+    {
+        "id": "4f2d20434c88e418",
+        "type": "json",
+        "z": "4f29fe90d9f287b6",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 330,
+        "y": 380,
+        "wires": [
+            [
+                "2d4b78a814092e0e"
+            ]
+        ]
+    },
+    {
+        "id": "2d4b78a814092e0e",
+        "type": "function",
+        "z": "4f29fe90d9f287b6",
+        "name": "SmartLume Lighting Rule",
+        "func": "let reading = msg.payload;\n\n// Convert JSON string into an object if required\nif (typeof reading === \"string\") {\n    reading = JSON.parse(reading);\n}\n\n// SmartLume lighting rule\nif (reading.motion_detected && reading.ambient_lux < 200) {\n    reading.brightness_pct = 100;\n} \nelse if (reading.motion_detected && reading.ambient_lux >= 200) {\n    reading.brightness_pct = 70;\n} \nelse if (!reading.motion_detected && reading.ambient_lux < 200) {\n    reading.brightness_pct = 30;\n} \nelse {\n    reading.brightness_pct = 0;\n}\n\n// Estimate power consumption\nreading.power_watts = Number(\n    (reading.brightness_pct * 0.5).toFixed(2)\n);\n\nmsg.payload = reading;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 380,
+        "wires": [
+            [
+                "b915f3ef5c22ed9e"
+            ]
+        ]
+    },
+    {
+        "id": "b915f3ef5c22ed9e",
+        "type": "debug",
+        "z": "4f29fe90d9f287b6",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 380,
+        "wires": []
+    }
+]
